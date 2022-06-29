@@ -1,6 +1,7 @@
-import { Button, Grid, Link, TextField, Typography } from "@mui/material";
+import { Alert, Button, Grid, Link, TextField, Typography } from "@mui/material";
+import { useMemo } from "react";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link as RouterLink } from "react-router-dom";
 import { useForm } from "../../hooks/useForm";
 import { startCreatingUserWithEmailPassword } from "../../store/auth/thunks";
@@ -36,6 +37,10 @@ const RegisterPage = () => {
   } = useForm(formData, formValidations);
 
   const dispatch = useDispatch();
+
+  const { status, errorMessage } = useSelector(state => state.auth);
+
+  const isCheckingAuthentication = useMemo(() => status === 'checking', [status]);
 
   const onSubmit = (event) => {
     event.preventDefault();
@@ -89,9 +94,13 @@ const RegisterPage = () => {
             />
           </Grid>
 
+          <Grid item xs={12} display={!!errorMessage ? '' : 'none'}>
+            <Alert severity="error">{errorMessage}</Alert>
+          </Grid>
+
           <Grid container spacing={2} sx={{ mb: 2, mt: 1 }}>
             <Grid item xs={12}>
-              <Button type="submit" variant="contained" fullWidth>
+              <Button type="submit" variant="contained" fullWidth disabled={isCheckingAuthentication}>
                 Crear cuenta
               </Button>
             </Grid>
